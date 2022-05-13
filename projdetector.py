@@ -14,17 +14,25 @@ def fetch_item_info(items, client, debug):
     for item_id in items:
         response = client.get(f"https://ollie.fund/api/item/{item_id}")
         item_data = response.json()
+
         if item_data['value']:
             value = int(item_data['value'])
-        elif not item_data['value']:
+        else:
             value = None
+        if item_data['lowestPrice']:
+            price = int(item_data['lowestPrice'])
+        else:
+            price = None
+
         item = {
             'id': int(item_data['id']),
             'name': item_data['name'],
             'acronym': item_data['acronym'],
             'rap': int(item_data['rap']),
-            'value': None
+            'value': value,
+            'price': price
         }
+
         new_items.append(item)
     return new_items
 
