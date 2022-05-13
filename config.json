@@ -1,4 +1,4 @@
 {
   "debug": 1,
-  "test_value": 0
+  "item_history_limit": 50
 }
