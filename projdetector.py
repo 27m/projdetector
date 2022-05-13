@@ -34,7 +34,7 @@ def parse_history(items, client, limit):
         history = response.json()['history']
         raps = []
         for date, values in history.items():
-            if dates_checked <= 20:
+            if dates_checked <= limit:
                 if values['rap']:
                     raps.append(values['rap'])
                 else:
@@ -44,8 +44,8 @@ def parse_history(items, client, limit):
                 break
 
         if not raps:
-            print("No data for this item.")
-            return
+            print(f"No data for item {item_id}")
+            raps = None
         item['rapHistory'] = raps
     return items
 
