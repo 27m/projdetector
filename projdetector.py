@@ -9,7 +9,7 @@ def fetch_config(config_file):
     return config['debug'], config['item_history_limit']
 
 
-def fetch_item_info(items, client):
+def fetch_item_info(items, client, debug):
     new_items = []
     for item_id in items:
         response = client.get(f"https://ollie.fund/api/item/{item_id}")
@@ -25,8 +25,9 @@ def fetch_item_info(items, client):
     return new_items
 
 
-def parse_history(items, client, limit):
-    print(limit)
+def parse_history(items, client, limit, debug):
+    if debug:
+        print(f"item history limit set to {limit}")
     for item in items:
         item_id = item['id']
         response = client.get(f"https://ollie.fund/api/history/{item_id}")
@@ -52,16 +53,17 @@ def parse_history(items, client, limit):
 
 class Detector:
     def __init__(self, items, config_file, async_client, client):
-        self.async_client = client
+        self.async_client = async_client
         self.client = client
         self.config = fetch_config(config_file)
-        self.debug = self.config[0]
+        self.debug = bool(self.config[0])
         self.limit = self.config[1]
-        self.items = parse_history(fetch_item_info(items, self.client), self.client, self.limit)
+        self.items = parse_history(fetch_item_info(items, self.client, self.debug), self.client, self.limit, self.debug)
 
     def detect(self):
         items = self.items
-        print(items)
+        if self.debug:
+            print(items)
         # projected algorithm goes here
 
 
