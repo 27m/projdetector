@@ -1,6 +1,6 @@
 import json
 import asyncio
-import httpx as httpx
+import httpx
 
 
 def fetch_config(config_file):
@@ -14,12 +14,16 @@ def fetch_item_info(items, client, debug):
     for item_id in items:
         response = client.get(f"https://ollie.fund/api/item/{item_id}")
         item_data = response.json()
+        if item_data['value']:
+            value = int(item_data['value'])
+        elif not item_data['value']:
+            value = None
         item = {
-            'id': item_data['id'],
+            'id': int(item_data['id']),
             'name': item_data['name'],
             'acronym': item_data['acronym'],
-            'rap': item_data['rap'],
-            'value': item_data['value']
+            'rap': int(item_data['rap']),
+            'value': None
         }
         new_items.append(item)
     return new_items
@@ -27,7 +31,7 @@ def fetch_item_info(items, client, debug):
 
 def parse_history(items, client, limit, debug):
     if debug:
-        print(f"item history limit set to {limit}")
+        print(f"Item history limit set to {limit}.")
     for item in items:
         item_id = item['id']
         response = client.get(f"https://ollie.fund/api/history/{item_id}")
@@ -45,17 +49,19 @@ def parse_history(items, client, limit, debug):
                 break
 
         if not raps:
-            print(f"No data for item {item_id}")
+            print(f"No data for {item['name']} ({item_id}).")
             raps = None
         item['rapHistory'] = raps
+        if debug:
+            print(f"Dates checked for {item_id}: {dates_checked}")
     return items
 
 
 class Detector:
-    def __init__(self, items, config_file, async_client, client):
+    def __init__(self, items, config_file_name, async_client, client):
         self.async_client = async_client
         self.client = client
-        self.config = fetch_config(config_file)
+        self.config = fetch_config(config_file_name)
         self.debug = bool(self.config[0])
         self.limit = self.config[1]
         self.items = parse_history(fetch_item_info(items, self.client, self.debug), self.client, self.limit, self.debug)
@@ -70,7 +76,7 @@ class Detector:
 async def main():
     async_client = httpx.AsyncClient()
     client = httpx.Client()
-    detector = Detector([1028606, 1028720, 1029025], "config.json", async_client, client)
+    detector = Detector([1028606, 1028720, 1029025, 1365767], "proj_detector_config.json", async_client, client)
     detector.detect()
 
 
