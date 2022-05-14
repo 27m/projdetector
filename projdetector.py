@@ -139,6 +139,7 @@ class Detector:
             for item in items:
                 if not item['projectedStatus']:
                     print(item)
+        return items
 
 
 async def main():
@@ -148,7 +149,8 @@ async def main():
     async_client = httpx.AsyncClient(headers=head)
     client = httpx.Client(headers=head)
     detector = Detector([1028606, 1029025, 1365767, 11297746, 138932314, 1125510, 19043710, 37819478, 6807134749], "proj_detector_config.json", async_client, client)
-    detector.detect()
+    final_items = detector.detect()
+    print(json.dumps(final_items, indent=4))
 
 
 if __name__ == "__main__":
