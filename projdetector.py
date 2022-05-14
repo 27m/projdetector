@@ -132,7 +132,7 @@ class Detector:
         items = self.items
         items = history_length_check(items, self.min_days, self.debug)
         items = parse_history(items)
-        avg_price_check(items, self.debug)
+        items = avg_price_check(items, self.debug)
         if self.debug:
             print(items)
             print("Items that are likely not projected and / or have accurate data:")
