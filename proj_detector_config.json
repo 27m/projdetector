@@ -1,4 +1,4 @@
 {
   "debug": 1,
-  "item_history_limit": 50
+  "minimum_days_of_history": 30
 }
